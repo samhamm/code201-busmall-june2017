@@ -2,3 +2,8 @@
   color: blue;
   outline: 1px dashed green;
 }
+
+img {
+  width: 250px;
+  margin: 25px;
+}
