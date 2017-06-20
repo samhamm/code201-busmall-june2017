@@ -1,11 +1,13 @@
 'use strict';
 
 Product.names = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
+Product.totalClicks = 0;
 
 Product.left = document.getElementById('left');
 Product.center = document.getElementById('center');
 Product.right = document.getElementById('right');
 Product.container = document.getElementById('image_container');
+Product.tally = document.getElementById('tally');
 
 function Product(name) {
   this.name = name;
@@ -52,16 +54,30 @@ function displayPics(){
 }
 
 function handleClick(event) {
+  Product.totalClicks += 1;
+  console.log(Product.totalClicks, 'total clicks');
+  if(Product.totalClicks > 24) {
+    Product.container.removeEventListener('click', handleClick);
+    showTally();
+  }
   if (event.target.id === 'image_container') {
     return alert('Click on an image, dumbass!');
   }
   for(var i = 0; i < Product.names.length; i++){
     if(event.target.id === Product.all[i].name) {
       Product.all[i].votes += 1;
-      console.log(event.target.id + ' has ' + Product.all[i].votes + ' votes in ' + Product.all[i].views + ' views' );
+      console.log(event.target.id + ' has ' + Product.all[i].votes + ' votes in ' + Product.all[i].views + ' views');
     }
   }
   displayPics();
+}
+
+function showTally() {
+    for(var i = 0; i < Product.all.length; i++) {
+      var liEl = document.createElement('li');
+      liEl.textContent = Product.all[i].name + ' has ' + Product.all[i].votes + ' votes in ' + Product.all[i].views + ' views';
+      Product.tally.appendChild(liEl);
+    }
 }
 
 Product.container.addEventListener('click', handleClick);
