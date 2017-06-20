@@ -1,11 +1,11 @@
 'use strict';
 
-var names = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
+Product.names = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-duck', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'usb', 'water-can', 'wine-glass'];
 
-var left = document.getElementById('left');
-var center = document.getElementById('center');
-var right = document.getElementById('right');
-var container = document.getElementById('image_container');
+Product.left = document.getElementById('left');
+Product.center = document.getElementById('center');
+Product.right = document.getElementById('right');
+Product.container = document.getElementById('image_container');
 
 function Product(name) {
   this.name = name;
@@ -17,41 +17,52 @@ function Product(name) {
 
 Product.all = [];
 
-for(var i = 0; i < names.length; i++) {
-  new Product(names[i]);
+for(var i = 0; i < Product.names.length; i++) {
+  new Product(Product.names[i]);
 }
 
 function makeRandom() {
-  return Math.floor(Math.random() * names.length);
+  return Math.floor(Math.random() * Product.names.length);
 }
 
 function displayPics(){
-  var showing = [];
-  showing[0] = makeRandom();
-  showing[1] = makeRandom();
-  while(showing[0] === showing[1]) {
-    console.log('Duplicate! Re-rolling!');
-    showing[1] = makeRandom();
+  var at = [];
+  at[0] = makeRandom();
+  at[1] = makeRandom();
+
+  while(at[0] === at[1]) {
+    console.error('Duplicate! Re-rolling!');
+    at[1] = makeRandom();
   }
-  showing[2] = makeRandom();
-  while(showing[0] === showing[2] || showing[1] === showing[2]){
-    console.log('Duplicate! Re-rolling!')
-    showing[2] = makeRandom();
+
+  at[2] = makeRandom();
+  while(at[0] === at[2] || at[1] === at[2]){
+    console.error('Duplicate! Re-rolling!')
+    at[2] = makeRandom();
   }
-  left.src = Product.all[showing[0]].path;
-  center.src = Product.all[showing[1]].path;
-  right.src = Product.all[showing[2]].path;
-  left.id = Product.all[showing[0]].name;
-  center.id = Product.all[showing[1]].name;
-  right.id = Product.all[showing[2]].name;
+  Product.left.src = Product.all[at[0]].path;
+  Product.center.src = Product.all[at[1]].path;
+  Product.right.src = Product.all[at[2]].path;
+  Product.left.id = Product.all[at[0]].name;
+  Product.center.id = Product.all[at[1]].name;
+  Product.right.id = Product.all[at[2]].name;
+  Product.all[at[0]].views += 1;
+  Product.all[at[1]].views += 1;
+  Product.all[at[2]].views += 1;
 }
 
 function handleClick(event) {
-  console.log(event.target.id + ' was clicked');
   if (event.target.id === 'image_container') {
-    alert('Click on an image, dumbass!');
+    return alert('Click on an image, dumbass!');
+  }
+  for(var i = 0; i < Product.names.length; i++){
+    if(event.target.id === Product.all[i].name) {
+      Product.all[i].votes += 1;
+      console.log(event.target.id + ' has ' + Product.all[i].votes + ' votes in ' + Product.all[i].views + ' views' );
+    }
   }
   displayPics();
 }
-container.addEventListener('click', handleClick);
+
+Product.container.addEventListener('click', handleClick);
 displayPics();
