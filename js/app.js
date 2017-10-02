@@ -4,7 +4,7 @@ Product.names = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum',
 
 Product.all = [];
 Product.container = document.getElementById('image_container');
-Product.justViewed = [];
+Product.viewed = [];
 Product.labels = [];
 Product.pics = [document.getElementById('left'),
                 document.getElementById('center'),
@@ -22,43 +22,26 @@ function Product(name) {
   Product.all.push(this);
 }
 
-for(var i = 0; i < Product.names.length; i++) {
-  new Product(Product.names[i]);
-}
-
 function makeRandom() {
   return Math.floor(Math.random() * Product.names.length);
 }
 
 function displayPics(){
-  var currentlyShowing = [];
-  // make left image unique
-  currentlyShowing[0] = makeRandom();
-  while (Product.justViewed.indexOf(currentlyShowing[0]) !== -1) {
-    // console.error('Match in prior view! Re-rolling');
-    currentlyShowing[0] = makeRandom();
+  // roll for three random indexes
+  while(Product.viewed.length < 6){
+    var rando = makeRandom();
+    while(!Product.viewed.includes(rando)){
+      Product.viewed.push(rando);
+    }
   }
-  // make center image unique
-  currentlyShowing[1] = makeRandom();
-  while(currentlyShowing[0] === currentlyShowing[1] ||
-        Product.justViewed.indexOf(currentlyShowing[1]) !== -1) {
-    // console.error('Duplicate, or in prior view! Re-rolling!');
-    currentlyShowing[1] = makeRandom();
-  }
-  // make right image unique
-  currentlyShowing[2] = makeRandom();
-  while(currentlyShowing[0] === currentlyShowing[2] ||
-        currentlyShowing[1] === currentlyShowing[2] ||
-        Product.justViewed.indexOf(currentlyShowing[2]) !== -1){
-    // console.error('Duplicate on 3rd one! Re-rolling!')
-    currentlyShowing[2] = makeRandom();
-  }
+  console.log(Product.viewed)
+
   // To the DOM and beyond!
   for (var i = 0; i < 3; i++){
-    Product.pics[i].src = Product.all[currentlyShowing[i]].path;
-    Product.pics[i].id = Product.all[currentlyShowing[i]].name;
-    Product.all[currentlyShowing[i]].views += 1;
-    Product.justViewed[i] = currentlyShowing[i];
+    var temp = Product.viewed.shift();
+    Product.pics[i].src = Product.all[temp].path;
+    Product.pics[i].id = Product.all[temp].name;
+    Product.all[temp].views += 1;
   }
 }
 
@@ -80,6 +63,7 @@ function handleClick(event) {
       // console.log(event.target.id + ' has ' + Product.all[i].votes + ' votes in ' + Product.all[i].views + ' views');
     }
   }
+  localStorage.busmall = JSON.stringify(Product.all);
   displayPics();
 }
 
@@ -118,7 +102,7 @@ function makeChart(){
       scales: {
         yAxes: [{
           ticks: {
-            max: 8,
+            max: 20,
             min: 0,
             stepSize: 1
           }
@@ -130,5 +114,20 @@ function makeChart(){
 }
 
 Product.container.addEventListener('click', handleClick);
+document.getElementById('bus').addEventListener('click', function(){
+  localStorage.removeItem('busmall');
+  console.log('Your local storage done got cleared!');
+})
+
+if(localStorage.busmall){
+  console.log('Local storage data exists');
+  Product.all = JSON.parse(localStorage.busmall)
+} else {
+  console.log('There is no local storage data; initialize app by creating instances');
+  for(var i = 0; i < Product.names.length; i++) {
+    new Product(Product.names[i]);
+  }
+  console.log(Product.all);
+}
 
 displayPics();
